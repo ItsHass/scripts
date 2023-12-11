@@ -1,1 +1,1 @@
-get-mguser -UserID "hz306da@sussex.ac.uk"
+get-mguser -UserID ""
