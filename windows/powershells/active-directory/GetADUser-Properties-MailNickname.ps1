@@ -6,9 +6,9 @@ $UserID = Read-Host -Prompt 'Please Enter Username'
 #Get-ADUser -Identity $UserID -Properties * | export-csv -path userexport.csv
 
 # show script
-Get-ADUser -Identity $UserID -Properties *
+Get-ADUser -Identity $UserID -Properties "mailNickname"  | Format-Table mailNickname -A
 
 
 pause
 
-& "$PSScriptRoot\GetADUser-Properties-All.ps1"
+& "$PSScriptRoot\GetADUser-Properties-MailNickname.ps1"

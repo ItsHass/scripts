@@ -1,0 +1,10 @@
+/////////////////////////
+How to run 
+//////////////////
+
+-- 1 double click the .cmd file 
+
+-- 2 type " ls " 
+
+-- 3 type " ./ " then TAB 
+

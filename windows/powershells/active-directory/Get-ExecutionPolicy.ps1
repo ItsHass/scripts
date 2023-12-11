@@ -1,0 +1,3 @@
+Get-ExecutionPolicy -List
+
+pause

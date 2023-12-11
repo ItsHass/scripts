@@ -1,4 +1,4 @@
-clear
+﻿clear
 import-module ActiveDirectory
 $GroupID = Read-Host -Prompt 'Please Enter Group Name'
 
