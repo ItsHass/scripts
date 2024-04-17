@@ -1,10 +1,13 @@
-from=/mnt/storj-4tb/node/storage/
-from1=/mnt/storj-4tb/node/orders/
-rm -r /mnt/storj-4tb_dbs_orders/*
-mkdir -p /mnt/storj-4tb_dbs_orders/dbs/
-mkdir -p /mnt/storj4-tb_dbs_orders/dbs/orders/
-to=/mnt/storj-4tb_dbs_orders/dbs
-to1=/mnt/storj-4tb_dbs_orders/dbs/orders
+from=/mnt/storj../storage/
+from1=/mnt/storj../orders/
+
+to=/mnt/storj_dbs/dbs
+to1=/mnt/storj_dbs/dbs/orders
+
+#rm -r /mnt/storj-4tb_dbs_orders/*
+mkdir -p $to
+mkdir -p $to1
+
 
 #rsync -avP -m --include="*.db" --exclude="*" "$from" "$to"
 rsync -aruvP -m --exclude='*/' "$from" "$to"
