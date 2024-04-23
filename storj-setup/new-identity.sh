@@ -1,4 +1,7 @@
+sudo apt install unzip
+
 clear
+
 read -p "Enter Storj Node Name: " NodeName
 
 curl -L https://github.com/storj/storj/releases/latest/download/identity_linux_amd64.zip -o identity_linux_amd64.zip
