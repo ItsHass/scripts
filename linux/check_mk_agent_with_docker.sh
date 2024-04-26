@@ -7,6 +7,6 @@ wget http://192.168.0.31:8080/cmk/check_mk/agents/plugins/mk_docker.py
 
 pip3 install docker
 
-install -m 0755 mk_docker.py /usr/lib/check_mk_agent/plugins
+sudo install -m 0755 mk_docker.py /usr/lib/check_mk_agent/plugins
 
 pip3 --version
