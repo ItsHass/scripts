@@ -164,8 +164,8 @@ print_centered "Storj Forwarding Port: 28967"
 echo -e "\n\n\n"
 echo "**NOTE: Server configuration is finished at this point."
 echo
-read -n 1 -s -r -p "Press any key to continue to configure the Client Wireguard."
+read -n 1 -s -r -p "Please now follow on using client-step1.sh on the Client device."
 
 
 ## now to configure client WG ##
-
+## client-step1.sh
