@@ -21,6 +21,6 @@ storage2_dbs=dbs
 storage2_orders=dbs/orders
 
 MaxLogSize=10m
-LogFilePath="/mnt/logs/storagenode/"
+LogFilePath=/mnt/logs/storagenode/
 
 LogLevel=error
