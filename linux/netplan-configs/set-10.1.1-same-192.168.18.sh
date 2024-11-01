@@ -3,14 +3,16 @@
 # Path to your Netplan configuration file
 NETPLAN_FILE="/etc/netplan/00-installer-config.yaml"
 
-# Retrieve the IP and interface name for the 192.168.18.x IP
-IP_192_INTERFACE=$(ip -4 addr show | grep -oP '(?<=^|\s)ens\d+.*inet 192\.168\.18\.\d+' | awk '{print $1}')
-IP_192=$(ip -4 addr show dev "$IP_192_INTERFACE" 2>/dev/null | grep -oP '(?<=inet\s)192\.168\.18\.\d+')
+# Retrieve the interface and IP for 192.168.18.x
+IP_192_INFO=$(ip -4 addr show | grep "192.168.18")
+IP_192_INTERFACE=$(echo "$IP_192_INFO" | awk '{print $NF}')
+IP_192=$(echo "$IP_192_INFO" | grep -oP '(?<=inet\s)192\.168\.18\.\d+')
 LAST_OCTET=$(echo "$IP_192" | awk -F '.' '{print $4}')
 
-# Retrieve the IP and interface name for the 10.1.1.x IP
-IP_10_INTERFACE=$(ip -4 addr show | grep -oP '(?<=^|\s)ens\d+.*inet 10\.1\.1\.\d+' | awk '{print $1}')
-IP_10=$(ip -4 addr show dev "$IP_10_INTERFACE" 2>/dev/null | grep -oP '(?<=inet\s)10\.1\.1\.\d+')
+# Retrieve the interface and IP for 10.1.1.x
+IP_10_INFO=$(ip -4 addr show | grep "10.1.1")
+IP_10_INTERFACE=$(echo "$IP_10_INFO" | awk '{print $NF}')
+IP_10=$(echo "$IP_10_INFO" | grep -oP '(?<=inet\s)10\.1\.1\.\d+')
 
 # Check if both interfaces were found
 if [[ -z "$IP_192_INTERFACE" || -z "$IP_10_INTERFACE" ]]; then
