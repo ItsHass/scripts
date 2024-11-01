@@ -4,13 +4,19 @@
 NETPLAN_FILE="/etc/netplan/00-installer-config.yaml"
 
 # Retrieve the IP and interface name for the 192.168.18.x IP
-IP_192_INTERFACE=$(ip -4 addr show | grep -oP '(?<=^| )ens\d+.*inet 192\.168\.18\.\d+' | awk '{print $1}')
-IP_192=$(ip -4 addr show dev "$IP_192_INTERFACE" | grep -oP '(?<=inet\s)192\.168\.18\.\d+')
+IP_192_INTERFACE=$(ip -4 addr show | grep -oP '(?<=^|\s)ens\d+.*inet 192\.168\.18\.\d+' | awk '{print $1}')
+IP_192=$(ip -4 addr show dev "$IP_192_INTERFACE" 2>/dev/null | grep -oP '(?<=inet\s)192\.168\.18\.\d+')
 LAST_OCTET=$(echo "$IP_192" | awk -F '.' '{print $4}')
 
 # Retrieve the IP and interface name for the 10.1.1.x IP
-IP_10_INTERFACE=$(ip -4 addr show | grep -oP '(?<=^| )ens\d+.*inet 10\.1\.1\.\d+' | awk '{print $1}')
-IP_10=$(ip -4 addr show dev "$IP_10_INTERFACE" | grep -oP '(?<=inet\s)10\.1\.1\.\d+')
+IP_10_INTERFACE=$(ip -4 addr show | grep -oP '(?<=^|\s)ens\d+.*inet 10\.1\.1\.\d+' | awk '{print $1}')
+IP_10=$(ip -4 addr show dev "$IP_10_INTERFACE" 2>/dev/null | grep -oP '(?<=inet\s)10\.1\.1\.\d+')
+
+# Check if both interfaces were found
+if [[ -z "$IP_192_INTERFACE" || -z "$IP_10_INTERFACE" ]]; then
+    echo "Error: Could not find interfaces with IP ranges 192.168.18.x or 10.1.1.x."
+    exit 1
+fi
 
 # Display current setup and proposed change for verification
 echo "Detected Interface with IP 192.168.18.x: $IP_192_INTERFACE | IP Address: $IP_192"
@@ -21,7 +27,7 @@ echo "Proposed change: Update $IP_10_INTERFACE IP from $IP_10 to 10.1.1.$LAST_OC
 read -p "Do you want to proceed with the changes? (y/n): " CONFIRM
 if [[ "$CONFIRM" != "y" && "$CONFIRM" != "Y" ]]; then
     echo "Aborting script as per user request."
-    exit 1
+    exit 0
 fi
 
 # Function to update the Netplan configuration
@@ -29,17 +35,14 @@ update_netplan_ip() {
     echo "Updating Netplan configuration for $IP_10_INTERFACE to use IP 10.1.1.$LAST_OCTET"
 
     # Use awk to update the 10.1.1.x IP address with the new one, preserving structure
-    awk -v new_ip="10.1.1.$LAST_OCTET" '
+    awk -v iface="$IP_10_INTERFACE" -v new_ip="10.1.1.$LAST_OCTET" '
         BEGIN {updated=0}
-        /'"$IP_10_INTERFACE"'/ {
-            print;
-            next
+        $0 ~ iface {
+            print; next
         }
-        /addresses:/ {
-            if (!updated && /10\.1\.1\./) {
-                sub(/10\.1\.1\.\d+/, new_ip);
-                updated=1;
-            }
+        /addresses:/ && /10\.1\.1\./ && !updated {
+            sub(/10\.1\.1\.\d+/, new_ip);
+            updated=1
         }
         {print}
     ' "$NETPLAN_FILE" > /tmp/netplan_config.yaml && sudo mv /tmp/netplan_config.yaml "$NETPLAN_FILE"
