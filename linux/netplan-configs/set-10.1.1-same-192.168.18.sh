@@ -15,8 +15,10 @@ IP_10_INTERFACE=$(echo "$IP_10_INFO" | awk '{print $NF}')
 IP_10=$(echo "$IP_10_INFO" | grep -oP '(?<=inet\s)10\.1\.1\.\d+')
 
 # Check if both interfaces were found
-if [[ -z "$IP_192_INTERFACE" || -z "$IP_10_INTERFACE" ]]; then
+if [ -z "$IP_192_INTERFACE" ] || [ -z "$IP_10_INTERFACE" ]; then
     echo "Error: Could not find interfaces with IP ranges 192.168.18.x or 10.1.1.x."
+    echo "IP_192_INTERFACE: '$IP_192_INTERFACE'"
+    echo "IP_10_INTERFACE: '$IP_10_INTERFACE'"
     exit 1
 fi
 
@@ -27,7 +29,7 @@ echo "Proposed change: Update $IP_10_INTERFACE IP from $IP_10 to 10.1.1.$LAST_OC
 
 # Get user confirmation
 read -p "Do you want to proceed with the changes? (y/n): " CONFIRM
-if [[ "$CONFIRM" != "y" && "$CONFIRM" != "Y" ]]; then
+if [ "$CONFIRM" != "y" ] && [ "$CONFIRM" != "Y" ]; then
     echo "Aborting script as per user request."
     exit 0
 fi
