@@ -38,18 +38,23 @@ fi
 update_netplan_ip() {
     echo "Updating Netplan configuration for $IP_10_INTERFACE to use IP 10.1.1.$LAST_OCTET"
 
-    # Use awk to update the 10.1.1.x IP address with the new one, preserving structure
-    awk -v iface="$IP_10_INTERFACE" -v new_ip="10.1.1.$LAST_OCTET" '
-        BEGIN {updated=0}
-        $0 ~ iface {
-            print; next
-        }
-        /addresses:/ && /10\.1\.1\./ && !updated {
-            sub(/10\.1\.1\.\d+/, new_ip);
-            updated=1
-        }
-        {print}
-    ' "$NETPLAN_FILE" > /tmp/netplan_config.yaml && sudo mv /tmp/netplan_config.yaml "$NETPLAN_FILE"
+    # Create a temporary file with elevated permissions
+    {
+        awk -v iface="$IP_10_INTERFACE" -v new_ip="10.1.1.$LAST_OCTET" '
+            BEGIN {updated=0}
+            $0 ~ iface {
+                print; next
+            }
+            /addresses:/ && /10\.1\.1\./ && !updated {
+                sub(/10\.1\.1\.\d+/, new_ip);
+                updated=1
+            }
+            {print}
+        ' "$NETPLAN_FILE"
+    } | sudo tee /tmp/netplan_config.yaml > /dev/null
+
+    # Move the temporary file to the Netplan configuration directory
+    sudo mv /tmp/netplan_config.yaml "$NETPLAN_FILE"
 }
 
 # Update the Netplan configuration
