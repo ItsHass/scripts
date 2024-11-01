@@ -12,6 +12,18 @@ LAST_OCTET=$(echo "$IP_192" | awk -F '.' '{print $4}')
 IP_10_INTERFACE=$(ip -4 addr show | grep -oP '(?<=^| )ens\d+.*inet 10\.1\.1\.\d+' | awk '{print $1}')
 IP_10=$(ip -4 addr show dev "$IP_10_INTERFACE" | grep -oP '(?<=inet\s)10\.1\.1\.\d+')
 
+# Display current setup and proposed change for verification
+echo "Detected Interface with IP 192.168.18.x: $IP_192_INTERFACE | IP Address: $IP_192"
+echo "Detected Interface with IP 10.1.1.x: $IP_10_INTERFACE | IP Address: $IP_10"
+echo "Proposed change: Update $IP_10_INTERFACE IP from $IP_10 to 10.1.1.$LAST_OCTET"
+
+# Get user confirmation
+read -p "Do you want to proceed with the changes? (y/n): " CONFIRM
+if [[ "$CONFIRM" != "y" && "$CONFIRM" != "Y" ]]; then
+    echo "Aborting script as per user request."
+    exit 1
+fi
+
 # Function to update the Netplan configuration
 update_netplan_ip() {
     echo "Updating Netplan configuration for $IP_10_INTERFACE to use IP 10.1.1.$LAST_OCTET"
