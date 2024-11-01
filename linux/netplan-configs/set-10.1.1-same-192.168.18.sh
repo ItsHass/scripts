@@ -53,6 +53,12 @@ update_netplan_ip() {
         ' "$NETPLAN_FILE"
     } | sudo tee /tmp/netplan_config.yaml > /dev/null
 
+    # Check if the temporary file was created successfully
+    if [ ! -f /tmp/netplan_config.yaml ]; then
+        echo "Error: Failed to create /tmp/netplan_config.yaml. Check your permissions."
+        exit 1
+    fi
+
     # Move the temporary file to the Netplan configuration directory
     sudo mv /tmp/netplan_config.yaml "$NETPLAN_FILE"
 }
@@ -63,6 +69,10 @@ update_netplan_ip
 # Apply the Netplan configuration
 echo "Applying Netplan configuration..."
 sudo netplan apply
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to apply Netplan configuration."
+    exit 1
+fi
 echo "Netplan configuration applied successfully."
 
 # Reset the 10.1.1.x interface
