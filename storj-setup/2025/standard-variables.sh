@@ -25,4 +25,5 @@ MaxLogSize=10m
 LogLevel=error
 CustomLog=piecestore=WARN
 
-HashStoreDIR=/mnt/disk
+HashStoreDIR=/mnt/hashstore
+filestatcacheDIR=/mnt/filestatcache

@@ -24,6 +24,7 @@ docker run -d \
   -e BANDWIDTH="1000TB" \
   -e STORAGE="$NodeSize" \
   --mount type=bind,source="$HashStoreDIR",destination=/app/config/storage/hashstore \
+  --mount type=bind,source="$filestatcacheDIR",destination=/app/config/storage/filestatcache \
   --mount type=bind,source="$IdentityLocation",destination=/app/identity \
   --mount type=bind,source="$StorageLocation",destination=/app/config \
   --mount type=bind,source="$dbs_location",destination=/app/dbs \
