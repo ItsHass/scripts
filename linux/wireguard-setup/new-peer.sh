@@ -4,7 +4,7 @@ clear
 # Set variables
 WG_CONF="/etc/wireguard/wg1.conf"
 SERVER_PUBLIC_KEY=$(wg show wg1 public-key)
-SERVER_ENDPOINT="ionos-server1.itshass.uk:51820"
+SERVER_ENDPOINT="xx:51820"
 WG_NETWORK="10.0.0.0/24"
 PEER_IP=""
 PEER_NAME=""
