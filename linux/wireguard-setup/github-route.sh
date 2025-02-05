@@ -5,11 +5,11 @@ GATEWAY="<ETHERNET_GATEWAY>"
 INTERFACE="enp0s3"  # Adjust if using a different Ethernet interface
 LOG_FILE="/etc/wireguard/github-routes.log"
 
-# Fetch GitHub IPs and filter for IPv4 only
-GITHUB_IPS=$(curl -s https://api.github.com/meta | jq -r '.git[], .web[]' | grep -P '^\d+\.\d+\.\d+\.\d+$')
+# Fetch GitHub IPs
+GITHUB_IPS=$(curl -s https://api.github.com/meta | jq -r '.git[], .web[]')
 
 if [ "$1" = "add" ]; then
-    echo "Adding GitHub IPv4 routes via $GATEWAY on $INTERFACE..."
+    echo "Adding GitHub routes via $GATEWAY on $INTERFACE..."
     
     # Save the current routes before adding new ones
     echo "$GITHUB_IPS" > "$LOG_FILE"
@@ -25,13 +25,13 @@ if [ "$1" = "add" ]; then
     done
 
 elif [ "$1" = "del" ]; then
-    echo "Removing GitHub IPv4 routes..."
+    echo "Removing GitHub routes..."
     for IP in $GITHUB_IPS; do
         ip route del "$IP" via "$GATEWAY" dev "$INTERFACE" || true
     done
 
 elif [ "$1" = "remove" ]; then
-    echo "Emergency: Removing old GitHub IPv4 routes from $LOG_FILE..."
+    echo "Emergency: Removing old GitHub routes from $LOG_FILE..."
     if [ -f "$LOG_FILE" ]; then
         OLD_IPS=$(cat "$LOG_FILE")
         for IP in $OLD_IPS; do
