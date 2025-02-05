@@ -1,4 +1,5 @@
 #!/bin/bash
+sudo apt install -y jq
 
 # Define the Ethernet gateway and interface
 GATEWAY="<ETHERNET_GATEWAY>"
