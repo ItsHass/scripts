@@ -2,11 +2,13 @@
 clear
 
 # Set variables
-WG_CONF="/etc/wireguard/wg1.conf"
-SERVER_PUBLIC_KEY=$(wg show wg1 public-key)
+WG_N="0"
+WG_CONF="/etc/wireguard/$WG_N.conf"
+SERVER_PUBLIC_KEY=$(wg show $WG_N public-key)
 SERVER_ENDPOINT="xx:51820"
 WG_NETWORK="10.0.0.0/24"
 PEER_IP=""
+PEER_IP_32=""
 PEER_NAME=""
 
 # Step 1: Generate keys for the new peer
@@ -27,6 +29,7 @@ find_available_ip() {
         IP="$BASE_IP.$i"
         if ! echo "$USED_IPS" | grep -q "$IP"; then
             PEER_IP="$IP/24"
+            PEER_IP_32="$IP/32"
             echo "Assigned IP: $PEER_IP"
             break
         fi
@@ -44,17 +47,17 @@ add_peer_to_server() {
     echo "" >> $WG_CONF
     echo "[Peer]" >> $WG_CONF
     echo "PublicKey = $PEER_PUBLIC_KEY" >> $WG_CONF
-    echo "AllowedIPs = $PEER_IP" >> $WG_CONF
+    echo "AllowedIPs = $PEER_IP_32" >> $WG_CONF
 
     # Apply changes to the WireGuard interface
-    wg set wg1 peer "$PEER_PUBLIC_KEY" allowed-ips "$PEER_IP"
+    wg set $WG_N peer "$PEER_PUBLIC_KEY" allowed-ips "$PEER_IP_32"
 }
 
 # Step 4: Create the peer configuration file
 create_peer_config() {
     echo "Creating the configuration file for the new peer..."
     read -p "Enter a name for this peer (e.g., laptop, phone): " PEER_NAME
-    PEER_CONF="$PEER_NAME-wg1.conf"
+    PEER_CONF="$PEER_NAME-$WG_N.conf"
 
     cat <<EOF > $PEER_CONF
 [Interface]
@@ -66,7 +69,7 @@ DNS = 1.1.1.1
 PublicKey = $SERVER_PUBLIC_KEY
 Endpoint = $SERVER_ENDPOINT
 AllowedIPs = 0.0.0.0/0
-PersistentKeepalive = 25
+PersistentKeepalive = 20
 EOF
 
     echo "Peer configuration created: $PEER_CONF"
