@@ -2,7 +2,7 @@
 clear
 
 # Set variables
-WG_N="0"
+WG_N="wg0"
 WG_CONF="/etc/wireguard/$WG_N.conf"
 SERVER_PUBLIC_KEY=$(wg show $WG_N public-key)
 SERVER_ENDPOINT="xx:51820"
