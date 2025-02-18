@@ -11,7 +11,7 @@ echo "Running with root privileges..."
 sudo apt update
 
 #install wireguard
-sudo apt install wireguard -y
+sudo apt install wireguard iptables nano -y
 
 #variables
 WGpublickey_path=/etc/wireguard/public.key
