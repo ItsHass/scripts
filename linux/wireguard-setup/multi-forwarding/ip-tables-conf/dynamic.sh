@@ -13,7 +13,7 @@ if [[ -z "$MODE" || -z "$DEST_IP" || -z "$PORT" ]]; then
 fi
 
 if [[ "$MODE" == "up" ]]; then
-    echo "Applying firewall rules for WireGuard peer (PreUp)..."
+    echo "$DEST_IP:$PORT >> Applying firewall rules for WireGuard peer (PreUp)..."
 
     # Allow traffic on the specified port
     iptables -I INPUT -p tcp -m state --state NEW --dport "$PORT" -j ACCEPT
@@ -24,7 +24,7 @@ if [[ "$MODE" == "up" ]]; then
     iptables -t nat -I PREROUTING -p udp --dport "$PORT" -j DNAT --to-destination "$DEST_IP":"$PORT"
 
 elif [[ "$MODE" == "down" ]]; then
-    echo "Removing firewall rules for WireGuard peer (PostDown)..."
+    echo "$DEST_IP:$PORT >> Removing firewall rules for WireGuard peer (PostDown)..."
 
     # Remove traffic rules
     iptables -D INPUT -p tcp -m state --state NEW --dport "$PORT" -j ACCEPT
@@ -35,9 +35,9 @@ elif [[ "$MODE" == "down" ]]; then
     iptables -t nat -D PREROUTING -p udp --dport "$PORT" -j DNAT --to-destination "$DEST_IP":"$PORT"
 
 else
-    echo "Invalid mode. Use 'up' for PreUp or 'down' for PostDown."
+    echo "Invalid mode. Use 'up' for PreUp or 'down' for PostDown. $DEST_IP:$PORT"
     exit 1
 fi
 
-echo "Operation completed successfully."
+echo "$DEST_IP:$PORT >> Operation completed successfully."
 exit 0
