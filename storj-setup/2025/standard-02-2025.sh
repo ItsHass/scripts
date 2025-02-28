@@ -31,6 +31,9 @@ docker run -d \
   --sysctl net.ipv4.tcp_fastopen=3 \
   --name $DockerName \
   storjlabs/storagenode:latest \
+  --storage2.monitor.verify-dir-readable-timeout=5m \
+  --storage2.monitor.verify-dir-readable-interval=5m \
+  --storage2.monitor.verify-dir-writable-timeout=5m \
   --storage2.database-dir=$storage2_dbs \
   --storage2.orders.path=$storage2_orders \
   --log.level=$LogLevel \
