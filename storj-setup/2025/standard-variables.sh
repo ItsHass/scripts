@@ -20,6 +20,9 @@ dbs_location=/mnt/storj_dbs/dbs/
 storage2_dbs=dbs
 storage2_orders=dbs/orders
 
+$storage2_dedicatedDisk=true
+$storage2_dedicatedDisk_reservedBytes=100GB
+
 MaxLogSize=10m
 
 LogLevel=error
