@@ -36,6 +36,8 @@ docker run -d \
   --storage2.monitor.verify-dir-writable-timeout=5m \
   --storage2.database-dir=$storage2_dbs \
   --storage2.orders.path=$storage2_orders \
+  --storage2.monitor.dedicated-disk=$storage2_dedicatedDisk \
+  --storage2.monitor.reserved-bytes=$storage2_dedicatedDisk_reservedBytes \
   --log.level=$LogLevel \
   --log.custom-level=$CustomLog \
   --pieces.enable-lazy-filewalker="true"
