@@ -16,10 +16,10 @@ VBOX_MOUNT="/mnt/cdrom"
 
 mkdir -p "$VBOX_MOUNT"
 
-if [ ! -f "$VBOX_ISO" ]; then
-    echo "Error: Guest Additions ISO not found. Please insert the ISO in VirtualBox."
-    exit 1
-fi
+#if [ ! -f "$VBOX_ISO" ]; then
+#    echo "Error: Guest Additions ISO not found. Please insert the ISO in VirtualBox."
+#    exit 1
+#fi
 
 mount -o loop "$VBOX_ISO" "$VBOX_MOUNT"
 bash "$VBOX_MOUNT/VBoxLinuxAdditions.run" --nox11
