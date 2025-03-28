@@ -8,11 +8,11 @@ fi
 
 SUDO_PASSWORD="$1"
 
-# Find the Docker container with a mount containing /mnt/
-CONTAINER_ID=$(docker inspect --format='{{.Id}} {{range .Mounts}}{{.Source}}{{end}}' $(docker ps -q) | grep "/mnt/" | awk '{print $1}')
+# Find the Docker container with a mount containing either /mnt/ or /disk/
+CONTAINER_ID=$(docker inspect --format='{{.Id}} {{range .Mounts}}{{.Source}}{{end}}' $(docker ps -q) | grep -E "/mnt/|/disk/" | awk '{print $1}')
 
 if [ -z "$CONTAINER_ID" ]; then
-    echo "No container found with /mnt/ mounted."
+    echo "No container found with /mnt/ or /disk/ mounted."
     exit 1
 fi
 
