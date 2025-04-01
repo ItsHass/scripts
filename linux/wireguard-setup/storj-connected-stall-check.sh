@@ -7,6 +7,7 @@ if [ -z "$1" ]; then
 fi
 
 SUDO_PASSWORD="$1"
+TEMP_LOG_FILE="/tmp/docker_log_check.txt"
 
 # Find the Docker container with a mount containing either /mnt/ or /disk/
 CONTAINER_ID=$(docker inspect --format='{{.Id}} {{range .Mounts}}{{.Source}}{{end}}' $(docker ps -q) | grep -E "/mnt/|/disk/" | awk '{print $1}')
@@ -18,12 +19,19 @@ fi
 
 echo "Targeting container: $CONTAINER_ID"
 
-# Get the last log line
-LAST_LOG=$(docker logs "$CONTAINER_ID" --tail 1 2>/dev/null)
+# Write last two log lines to a temp file
+docker logs "$CONTAINER_ID" --tail 2 > "$TEMP_LOG_FILE" 2>&1
 
-# Check if the last log line ends with "connected."
-if [[ "$LAST_LOG" == *"connected." ]]; then
-    echo "Last log line confirms connection. Restarting process..."
+# Read from the temporary log file
+SECOND_LAST_LOG=$(head -n 1 "$TEMP_LOG_FILE")
+LAST_LOG=$(tail -n 1 "$TEMP_LOG_FILE")
+
+echo "Second last log: $SECOND_LAST_LOG"
+echo "Last log: $LAST_LOG"
+
+# Check for "Connecting" being stuck
+if grep -q "Connecting" "$TEMP_LOG_FILE" && ! grep -q "Connected." "$TEMP_LOG_FILE"; then
+    echo "Stuck on 'Connecting'. Restarting process..."
 
     echo "$SUDO_PASSWORD" | sudo -S wg-quick down wg0
     docker kill "$CONTAINER_ID"
@@ -33,5 +41,8 @@ if [[ "$LAST_LOG" == *"connected." ]]; then
 
     echo "Process completed."
 else
-    echo "No 'connected.' message found in logs. Exiting."
+    echo "No 'Connecting' issue detected in logs. Exiting."
 fi
+
+# Clean up temporary log file
+rm -f "$TEMP_LOG_FILE"
