@@ -1,7 +1,7 @@
 # Main script: run.sh
 
 # Source the variables from the external file
-source ./variables.sh
+source ./standard-variables.sh
 
 # Stop and remove the existing Docker container
 docker stop $DockerRemoveName &> /dev/null
