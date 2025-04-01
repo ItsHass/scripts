@@ -1,16 +1,16 @@
 # Variables for Docker storage node setup
 
-DockerRemoveName=storagenode
-DockerName=storagenode
+DockerRemoveName=storj
+DockerName=storj
 
 NodeSize=3.5TB
 Port=28969
 DashPort=14002
-Wallet=xxxxxxxxxxxxxxxxx
-Email=xxxxxxxxxxxxxxxxxx
+Wallet=
+Email=
 
-Domain=....
-Windscribe_Port=....
+Domain=
+Windscribe_Port=
 ExtAddr=$Domain:$Windscribe_Port
 
 IdentityLocation=/mnt/location
