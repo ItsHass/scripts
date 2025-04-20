@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# Prompt for serial number
+read -rp "Enter serial number: " serial
+
+# Define mount point
+mount_point="/mnt/disk/$serial"
+
+# Create directories
+mkdir -p "$mount_point"
+mkdir -p "$mount_point/node_data"
+mkdir -p /mnt/disk/hashstore
+mkdir -p /mnt/storj_dbs/
+mkdir -p /mnt/disk/filestatcache
+
+# Device to mount
+device="/dev/sdb"
+
+# Get UUID of the device
+uuid=$(blkid -s UUID -o value "$device")
+
+if [ -z "$uuid" ]; then
+    echo "Error: Could not find UUID for $device"
+    exit 1
+fi
+
+# Mount the device
+mount "$device" "$mount_point"
+
+# Backup fstab before modifying
+cp /etc/fstab /etc/fstab.backup
+
+# Add to /etc/fstab
+echo "UUID=$uuid $mount_point ext4 defaults,nofail 0 2" >> /etc/fstab
+
+echo "Mount and fstab entry complete."
