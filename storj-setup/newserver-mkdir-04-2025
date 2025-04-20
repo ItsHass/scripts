@@ -6,13 +6,6 @@ read -rp "Enter serial number: " serial
 # Define mount point
 mount_point="/mnt/disk/$serial"
 
-# Create directories
-mkdir -p "$mount_point"
-mkdir -p "$mount_point/node_data"
-mkdir -p /mnt/disk/hashstore
-mkdir -p /mnt/storj_dbs/
-mkdir -p /mnt/disk/filestatcache
-
 # Device to mount
 device="/dev/sdb"
 
@@ -26,6 +19,14 @@ fi
 
 # Mount the device
 mount "$device" "$mount_point"
+
+# Create directories
+mkdir -p "$mount_point"
+mkdir -p "$mount_point/node_data"
+mkdir -p /mnt/disk/hashstore
+mkdir -p /mnt/storj_dbs/
+mkdir -p /mnt/disk/filestatcache
+
 
 # Backup fstab before modifying
 cp /etc/fstab /etc/fstab.backup
