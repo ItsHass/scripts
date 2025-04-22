@@ -169,3 +169,7 @@ read -n 1 -s -r -p "Please now follow on using client-step1.sh on the Client dev
 
 ## now to configure client WG ##
 ## client-step1.sh
+
+systemctl enable wg-quick@wg0
+systemctl start wg-quick@wg0
+systemctl status wg-quick@wg0
