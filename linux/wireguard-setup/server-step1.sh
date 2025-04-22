@@ -99,12 +99,12 @@ PostDown = iptables -t nat -D POSTROUTING -o %i -j MASQUERADE
 # Note: in the next session we are inserting the rules below at position 6, before the default REJECT rule present on Oracle VMS. Your VPS may have similar default rules; adjust accordingly. 
 
 # Allow Wireguard ports through the firewall
-PreUp = iptables -I INPUT 6 -p udp --dport 51820 -j ACCEPT
+PreUp = iptables -I INPUT -p udp --dport 51820 -j ACCEPT
 PostDown = iptables -D INPUT -p udp --dport 51820 -j ACCEPT
 
 # Allow STORJ ports through the firewall
-PreUp = iptables -I INPUT 6 -p tcp -m state --state NEW --dport 28967 -j ACCEPT
-PreUp = iptables -I INPUT 6 -p udp --dport 28967 -j ACCEPT
+PreUp = iptables -I INPUT -p tcp -m state --state NEW --dport 28967 -j ACCEPT
+PreUp = iptables -I INPUT -p udp --dport 28967 -j ACCEPT
 PostDown = iptables -D INPUT -p tcp -m state --state NEW --dport 28967 -j ACCEPT
 PostDown = iptables -D INPUT -p udp --dport 28967 -j ACCEPT
 
