@@ -1,50 +1,67 @@
 #!/bin/bash
 
-# Function to convert bytes to human-readable format
+# --- CONFIG ---
+POST_URL="https://xxxxxxxxxxxx/_n8n_files/storj_getContainersData.php"
+SUDO_PASS="xxxxxxxxxxx"
+
+# --- FUNCTIONS ---
+install_if_missing() {
+    for pkg in "$@"; do
+        if ! command -v "$pkg" &> /dev/null; then
+            echo "$pkg not found. Installing..."
+            echo "$SUDO_PASS" | sudo -S apt-get update -qq
+            echo "$SUDO_PASS" | sudo -S apt-get install -y "$pkg"
+        fi
+    done
+}
+
 convert_bytes() {
     local bytes=$1
-    if (( bytes >= 1099511627776 )); then
-        echo "$(awk "BEGIN {printf \"%.2f TB\", $bytes/1099511627776}")"
-    elif (( bytes >= 1073741824 )); then
-        echo "$(awk "BEGIN {printf \"%.2f GB\", $bytes/1073741824}")"
-    elif (( bytes >= 1048576 )); then
-        echo "$(awk "BEGIN {printf \"%.2f MB\", $bytes/1048576}")"
+    if awk "BEGIN {exit !($bytes >= 1099511627776)}"; then
+        awk "BEGIN {printf \"%.2f TB\", $bytes/1099511627776}"
+    elif awk "BEGIN {exit !($bytes >= 1073741824)}"; then
+        awk "BEGIN {printf \"%.2f GB\", $bytes/1073741824}"
+    elif awk "BEGIN {exit !($bytes >= 1048576)}"; then
+        awk "BEGIN {printf \"%.2f MB\", $bytes/1048576}"
     else
         echo "$bytes B"
     fi
 }
 
-# Get local IP starting with 192
+# --- CHECK DEPENDENCIES ---
+install_if_missing docker jq curl awk getent
+
+# --- GET LOCAL IP ---
 LOCAL_IP=$(hostname -I | awk '{for(i=1;i<=NF;i++) if ($i ~ /^192\./) print $i; exit}')
 
-# Find all storagenode containers
+# --- FIND STORAGENODE CONTAINERS ---
 containers=$(docker ps --filter "ancestor=storjlabs/storagenode" --format "{{.Names}}")
 
 for container in $containers; do
     echo "Processing container: $container"
 
     # Extract ADDRESS
-    address=$(docker inspect "$container" | grep -oP '"ADDRESS=\K[^"]+')
+    address=$(docker inspect "$container" | grep -oP '"ADDRESS=\K[^\"]+')
     domain=${address%%:*}
     port=${address##*:}
 
     # Extract WALLET
-    wallet=$(docker inspect "$container" | grep -oP '"WALLET=\K[^"]+')
+    wallet=$(docker inspect "$container" | grep -oP '"WALLET=\K[^\"]+')
 
-    # Get external IP by resolving domain
+    # Resolve external IP
     external_ip=$(getent ahosts "$domain" | awk '{ print $1; exit }')
 
-    # Get host port that starts with 14 (typically 14002)
+    # Get HostPort that starts with 14
     host_port=$(docker inspect "$container" | grep -A10 '"Ports": {' | grep '"HostPort": "14' | head -n1 | grep -oP '\d+')
 
-    # Combine local IP and port
+    # Form API URL
     api_url="http://$LOCAL_IP:$host_port"
 
-    # Curl sno API
+    # Get node info
     sno_json=$(curl -s "$api_url/api/sno/")
     satellites_json=$(curl -s "$api_url/api/sno/satellites")
 
-    # Extract values from sno_json
+    # Extract sno values
     nodeID=$(echo "$sno_json" | jq -r '.nodeID')
     node_wallet=$(echo "$sno_json" | jq -r '.wallet')
     quicStatus=$(echo "$sno_json" | jq -r '.quicStatus')
@@ -52,18 +69,25 @@ for container in $containers; do
     lastPinged=$(echo "$sno_json" | jq -r '.lastPinged')
     version=$(echo "$sno_json" | jq -r '.version')
 
-    # Extract and convert atRestTotalBytes
+    # Extract and convert storage size
     atRestTotalBytes=$(echo "$satellites_json" | jq -r '.storageDaily[0].atRestTotalBytes')
     avg_hdd_usage=$(convert_bytes "$atRestTotalBytes")
 
-    # Post to PHP endpoint
-    curl -s -X POST http://your-server.com/storj_update.php \
-        --data-urlencode "storjID=$nodeID" \
-        --data-urlencode "wallet=$node_wallet" \
-        --data-urlencode "local_ipaddress=$LOCAL_IP" \
-        --data-urlencode "external_host=$domain" \
-        --data-urlencode "external_port=$port" \
-        --data-urlencode "external_ipaddress=$external_ip" \
-        --data-urlencode "avg_hdd_usage=$avg_hdd_usage" \
-        --data-urlencode "lastcontact=$lastPinged"
+    # POST to PHP
+    curl -s -X POST "$POST_URL" \
+        -d "storjID=$nodeID" \
+        -d "wallet=$node_wallet" \
+        -d "local_ipaddress=$LOCAL_IP" \
+        -d "external_host=$domain" \
+        -d "external_port=$port" \
+        -d "external_ipaddress=$external_ip" \
+        -d "avg_hdd_usage=$avg_hdd_usage" \
+        -d "lastcontact=$lastPinged" \
+        -d "quicStatus=$quicStatus" \
+        -d "lastQuicPingedAt=$lastQuicPingedAt" \
+        -d "lastPinged=$lastPinged" \
+        -d "version=$version"
+
+echo "
+Completed: $container"
 done
