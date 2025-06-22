@@ -1,35 +1,52 @@
 #!/bin/bash
+
+# =======================
+# Configurable Variables
+# =======================
+
+SOURCE_DIR="/mnt/xxx/node/"
+DEST_DIR="/mnt/xxx/node/"
+LOG_DIR="/mnt/xxx"
+SYNC_LOG="$LOG_DIR/sync.log"
+SYNC_1_LOG="$LOG_DIR/sync_1.log"
+SYNC_2_LOG="$LOG_DIR/sync_2.log"
+SLEEP_DURATION=5
+
+# =======================
+# Functions
+# =======================
+
+log() {
+    echo "$1"
+    echo "$1" >> "$SYNC_LOG"
+}
+
+run_sync() {
+    local sync_label=$1
+    local log_file=$2
+
+    log "Running $sync_label"
+    date | tee -a "$SYNC_LOG"
+
+    rsync -auh --delete --progress "$SOURCE_DIR" "$DEST_DIR" >> "$log_file"
+
+    log "$sync_label Finished"
+    date | tee -a "$SYNC_LOG"
+}
+
+# =======================
+# Main Script Execution
+# =======================
+
 clear
-echo Running Sync 1
 
-date
+run_sync "Sync 1" "$SYNC_1_LOG"
 
-echo Running Sync 1 >> /mnt/xxx/sync.log
-date >> /mnt/xxx/sync.log
+log "Sleeping for $SLEEP_DURATION seconds"
+sleep "$SLEEP_DURATION"
 
-rsync -auh --delete --progress /mnt/xxx/node/ /mnt/xxx/node/ >> /mnt/xxx/sync_1.log
+log "-------"
 
-echo Sync 1 Finished
-echo Sync 1 Finished >> /mnt/xxx/sync.log
-date
-date >> /mnt/xxx/sync.log
+run_sync "Sync 2" "$SYNC_2_LOG"
 
-echo sleeping 5 seconds
-sleep 5
-
-echo -------
-date
-echo Running Sync 2
-echo Running Sync 2 >> /mnt/xxx/sync.log
-date >> /mnt/xxx/sync.log
-
-rsync -auh --delete --progress /mnt/xxx/node/ /mnt/xxx/node/ >> /mnt/xxx/sync_2.log
-
-echo Sync 2 Finished
-echo Sync 2 Finished >> /mnt/xxx/sync.log
-date
-date >> /mnt/xxx/sync.log
-
-echo finished 2 x syncs
-
-echo finished 2 x syncs >> /mnt/xxx/sync.log
+log "Finished 2 x syncs"
