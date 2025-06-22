@@ -17,8 +17,7 @@ if [ -z "$uuid" ]; then
     exit 1
 fi
 
-# Mount the device
-mount "$device" "$mount_point"
+
 
 # Create directories
 mkdir -p "$mount_point"
@@ -27,6 +26,8 @@ mkdir -p /mnt/disk/hashstore
 mkdir -p /mnt/storj_dbs/
 mkdir -p /mnt/disk/filestatcache
 
+# Mount the device
+mount "$device" "$mount_point"
 
 # Backup fstab before modifying
 cp /etc/fstab /etc/fstab.backup
