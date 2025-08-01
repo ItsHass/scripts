@@ -1,5 +1,7 @@
 #!/bin/bash
 
+##    */10 * * * * bash /root/update-ufw-allowed-hosts.sh >/dev/null 2>&1
+
 # Set safe PATH for cron
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
