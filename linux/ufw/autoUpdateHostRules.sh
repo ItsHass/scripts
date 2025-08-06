@@ -7,7 +7,7 @@ PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
 # Configuration
 HOSTS=("domain.uk" "domain.uk")
-VPN_CIDR="10.10.0.0/24"
+CIDRS=("10.10.0.0/24" "192.168.1.0/24" "172.16.5.5/32")  # Add as many as needed
 PORTS=(22)
 UFW_COMMENT="auto-allowed"
 
@@ -23,7 +23,7 @@ for HOST in "${HOSTS[@]}"; do
 done
 
 # Include VPN subnet
-RESOLVED_IPS+=("$VPN_CIDR")
+RESOLVED_IPS+=("${CIDRS[@]}")
 
 # Loop over ports and IPs
 for PORT in "${PORTS[@]}"; do
