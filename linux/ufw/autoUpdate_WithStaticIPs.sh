@@ -8,7 +8,7 @@
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
 # === Config ===
-HOSTS=("server02.itshass.uk" "svr01.itshass.uk")  # hostnames to resolve dynamically
+HOSTS=("domain1" "domain2")  # hostnames to resolve dynamically
 STATIC_CIDRS=("10.10.0.0/24" "192.168.1.0/24" "172.16.5.5/32")  # permanent ranges (VPN etc.)
 PORTS=(22)   # restrict to SSH only, or add PBS ports if needed
 UFW_COMMENT="auto-allowed-with-static"
