@@ -6,8 +6,8 @@ set -euo pipefail
 
 bash hestia-fw-clear.sh;
 
-CONFIG="/root/HESTIA/firewall-rules/firewall-hosts.conf"
-LOG="/root/HESTIA/firewall-rules/logs/hestia-fw-sync.log"
+CONFIG="firewall-hosts.conf"
+LOG="logs/hestia-fw-sync.log"
 PREFIX="AUTOHOST"
 
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >> "$LOG"; }
