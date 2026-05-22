@@ -17,8 +17,8 @@ echo "===== Removing old crash reports ====="
 rm -f /var/crash/*
 
 echo "===== Cleaning journal logs ====="
-journalctl --vacuum-time=7d
-journalctl --vacuum-size=200M
+journalctl --vacuum-time=2d
+journalctl --vacuum-size=50M
 
 echo "===== Cleaning temporary files ====="
 rm -rf /tmp/*
